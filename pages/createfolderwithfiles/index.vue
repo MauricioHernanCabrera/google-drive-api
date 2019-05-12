@@ -8,7 +8,20 @@
       <button class="m-5" type="submit">Subir archivo</button>
     </form>
 
-    <p>{{ percentajeTotal }}%</p>
+    <div>
+      <h3 style="margin: 0;">Enviando</h3>
+      <ul style="margin: 0; padding: 0;">
+        <li
+          v-for="(file, fileIndex) in form.files"
+          :key="fileIndex"
+          style="display: flex; justify-content: space-between;"
+        >
+          <span>{{ file.name }}</span>
+          <span>({{ calculatePercent(progress[fileIndex]) }}%)</span>
+        </li>
+      </ul>
+      <p style="margin: 0; text-align: end;">Total: ({{ percentajeTotal }}%)</p>
+    </div>
   </div>
 </template>
 
@@ -25,10 +38,12 @@ export default {
     return {
       form: {
         // name: "",
-        file: {}
+        files: []
       },
 
-      progress: []
+      progress: [],
+
+      sending: false
     };
   },
 
@@ -38,6 +53,7 @@ export default {
     },
 
     async createFolderWithFiles() {
+      this.sending = true;
       try {
         const date = new Date();
         const [year, mount, day, hours, minutes, seconds] = [
@@ -78,6 +94,8 @@ export default {
         console.log(filesResponse);
       } catch (error) {
         console.log(error);
+      } finally {
+        this.sending = false;
       }
     },
 
@@ -156,10 +174,12 @@ export default {
         { loaded: 0, total: 0 }
       );
 
-      return this.calculatePercent({
-        loaded,
-        total
-      });
+      return (
+        this.calculatePercent({
+          loaded,
+          total
+        }) || 0
+      );
     }
   }
 };
