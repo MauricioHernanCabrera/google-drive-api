@@ -7,7 +7,7 @@ export default async ({ store }) => {
         const response = await gapi.client.drive.files.list({
           pageSize: 1,
           q:
-            "name='apuntus-tus-apuntes-no-eliminar' and mimeType='application/vnd.google-apps.folder'"
+            "name='apuntus.com' and mimeType='application/vnd.google-apps.folder'"
         });
 
         if (response.result.files.length) {
@@ -16,7 +16,7 @@ export default async ({ store }) => {
           console.log('Ya estaba creado');
         } else {
           const baseFolder = await gapi.client.drive.files.create({
-            name: 'apuntus-tus-apuntes-no-eliminar',
+            name: 'apuntus.com',
             mimeType: 'application/vnd.google-apps.folder'
           });
           console.log('Se creo');

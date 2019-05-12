@@ -7,6 +7,8 @@
       <br>
       <button class="m-5" type="submit">Subir archivo</button>
     </form>
+
+    <p>{{ percentajeTotal }}%</p>
   </div>
 </template>
 
@@ -24,7 +26,9 @@ export default {
       form: {
         // name: "",
         file: {}
-      }
+      },
+
+      progress: []
     };
   },
 
@@ -36,15 +40,19 @@ export default {
     async createFolderWithFiles() {
       try {
         const date = new Date();
+        const [year, mount, day, hours, minutes, seconds] = [
+          `${this.pad2(date.getFullYear())}`,
+          `${this.pad2(date.getMonth() + 1)}`,
+          `${this.pad2(date.getDate())}`,
+          `${this.pad2(date.getHours())}`,
+          `${this.pad2(date.getMinutes())}`,
+          `${this.pad2(date.getSeconds())}`
+        ];
 
         const folderId = this.baseFolder.id;
         const folderResponse = await this.createFolder(
           folderId,
-          `${this.pad2(date.getFullYear())}-${this.pad2(
-            date.getMonth() + 1
-          )}-${this.pad2(date.getDate())}-${this.pad2(
-            date.getHours()
-          )}-${this.pad2(date.getMinutes())}-${this.pad2(date.getSeconds())}`
+          `${day}/${mount}/${year}   ${hours}h:${minutes}m:${seconds}s`
         );
 
         const folderPermisionResponse = await this.createPermission(
@@ -56,9 +64,12 @@ export default {
 
         for (let i = 0; i < files.length; i++) {
           promisesFiles.push(
-            this.createFile(folderResponse.result.id, files[i], event =>
-              console.log(`${files[i].name} - ${this.calculatePercent(event)}%`)
-            )
+            this.createFile(folderResponse.result.id, files[i], event => {
+              const { loaded = 1, total = 1 } = event;
+              const progress = JSON.parse(JSON.stringify(this.progress));
+              progress[i] = { loaded, total };
+              this.progress = progress;
+            })
           );
         }
 
@@ -115,21 +126,41 @@ export default {
       });
     },
 
-    calculatePercent() {
-      let percent = 0;
-      const position = event.loaded || event.position;
-      const total = event.total;
-      if (event.lengthComputable) {
+    calculatePercent(event) {
+      try {
+        let percent = 0;
+        const position = event.loaded;
+        const total = event.total;
         percent = Math.ceil((position / total) * 100);
+        console.log(((position / total) * 100).toFixed(2));
+        return percent;
+      } catch (error) {
+        return 0;
       }
-      return percent;
     },
 
     pad2: number => (String(number).length == 1 ? `0${number}` : number)
   },
 
   computed: {
-    ...mapState("user", ["baseFolder"])
+    ...mapState("user", ["baseFolder"]),
+
+    percentajeTotal() {
+      // console.log("Entro");
+      const { loaded, total, lengthComputable } = this.progress.reduce(
+        (ant, act) => {
+          ant.loaded += act.loaded;
+          ant.total += act.total;
+          return ant;
+        },
+        { loaded: 0, total: 0 }
+      );
+
+      return this.calculatePercent({
+        loaded,
+        total
+      });
+    }
   }
 };
 </script>
