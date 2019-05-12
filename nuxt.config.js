@@ -19,9 +19,7 @@ export default {
       { hid: 'description', name: 'description', content: pkg.description }
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
-    script: [
-      { async: true, defer: true, src: 'https://apis.google.com/js/api.js' }
-    ]
+    script: [{ src: 'https://apis.google.com/js/api.js' }]
   },
   /*
    ** Customize the progress-bar color

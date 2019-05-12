@@ -5,7 +5,7 @@
         <nuxt-link to="/">Estado del usuario</nuxt-link>
       </li>
       <li>
-        <nuxt-link to="/upload">Subir archivos</nuxt-link>
+        <nuxt-link to="/createfolderwithfiles">Crear carpeta con archivos</nuxt-link>
       </li>
       <li>
         <nuxt-link to="/list">Listar archivos</nuxt-link>
