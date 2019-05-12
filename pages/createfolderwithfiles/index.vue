@@ -50,6 +50,7 @@ export default {
         const folderPermisionResponse = await this.createPermission(
           folderResponse.result.id
         );
+
         const { files } = this.form;
         const promisesFiles = [];
 

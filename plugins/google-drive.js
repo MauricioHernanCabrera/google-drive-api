@@ -8,21 +8,19 @@ export default async ({ store }) => {
           pageSize: 1,
           q:
             "name='apuntus-tus-apuntes-no-eliminar' and mimeType='application/vnd.google-apps.folder'"
-          // spaces: 'appDataFolder'
         });
-        console.log('Entro', response);
 
         if (response.result.files.length) {
+          console.log(response.result.files);
           store.commit('user/SET_BASE_FOLDER', response.result.files[0]);
           console.log('Ya estaba creado');
         } else {
           const baseFolder = await gapi.client.drive.files.create({
             name: 'apuntus-tus-apuntes-no-eliminar',
-            mimeType: 'application/vnd.google-apps.folder',
-            parents: ['appDataFolder']
+            mimeType: 'application/vnd.google-apps.folder'
           });
-          console.log(baseFolder);
           console.log('Se creo');
+          store.commit('user/SET_BASE_FOLDER', baseFolder.result);
         }
       } catch (error) {
         // console.log(error);

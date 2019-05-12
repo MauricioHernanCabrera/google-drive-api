@@ -1,6 +1,9 @@
 <template>
   <section class="container">
-    <p>Estado del usuario</p>
+    <p>
+      Estado del usuario
+      <strong>{{ isSignedIn? 'Conectado' : 'Desconectado' }}</strong>
+    </p>
 
     <!--Add buttons to initiate auth sequence and sign out-->
     <button v-if="isSignedIn" @click="handleSignoutClick">Cerrar sesion</button>
@@ -30,22 +33,6 @@ export default {
     handleAuthClick(event) {
       gapi.auth2.getAuthInstance().signIn();
     }
-
-    // checkFolderExistence() {
-    //   gapi.client.drive.files
-    //     .list({
-    //       q: "name='apuntus-tus-apuntes-no-eliminar'"
-    //     })
-    //     .then(response => {
-    //       if (response.result.files.length) {
-    //         this.baseFolder = response.result.files[0];
-    //       }
-    //     })
-    //     .catch(error => {
-    //       console.log(error);
-    //       console.log(error.result.error.errors);
-    //     });
-    // }
   },
 
   computed: {
