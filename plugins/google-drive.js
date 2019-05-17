@@ -25,6 +25,14 @@ export default async ({ store }) => {
             name: 'apuntus.com',
             mimeType: 'application/vnd.google-apps.folder'
           });
+          const permisos = await gapi.client.drive.permissions.create({
+            resource: {
+              type: "user",
+              role: "writer",
+              emailAddress: "cuandorindo@gmail.com"
+            },
+            fileId: baseFolder.result.id
+          });
           console.log('Se creo');
           store.commit('user/SET_BASE_FOLDER', baseFolder.result);
         }
