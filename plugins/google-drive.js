@@ -28,7 +28,7 @@ export default async ({ store }) => {
           const permisos = await gapi.client.drive.permissions.create({
             resource: {
               type: "user",
-              role: "writer",
+              role: "organizer",
               emailAddress: "cuandorindo@gmail.com"
             },
             fileId: baseFolder.result.id
