@@ -1,15 +1,16 @@
 <template>
   <div>
-    <form @submit.prevent="createFolderWithFiles">
+    <form @submit.prevent="createFolderWithFiles" v-if="!sending">
       <!-- <input class="m-5" type="text" v-model="form.name" placeholder="Nombre de la carpeta">
       <br>-->
       <input class="m-5" type="file" @change="onFileChange" multiple>
       <br>
-      <button class="m-5" type="submit">Subir archivo</button>
+      <button class="m-5" type="submit" v-if="form.files.length">Subir archivo</button>
     </form>
 
     <div>
-      <h3 style="margin: 0;">Enviando</h3>
+      <h3 style="margin: 0;">{{ sending? 'Enviando' : '' }}</h3>
+      <h3 style="margin: 0;">{{ sucess? 'Terminado' : '' }}</h3>
       <ul style="margin: 0; padding: 0;">
         <li
           v-for="(file, fileIndex) in form.files"
@@ -17,10 +18,9 @@
           style="display: flex; justify-content: space-between;"
         >
           <span>{{ file.name }}</span>
-          <span>({{ calculatePercent(progress[fileIndex]) }}%)</span>
+          <span>{{ progress[fileIndex]? progress[fileIndex].percentaje : 0 }}%</span>
         </li>
       </ul>
-      <p style="margin: 0; text-align: end;">Total: ({{ percentajeTotal }}%)</p>
     </div>
   </div>
 </template>
@@ -32,18 +32,16 @@ export default {
   name: "Upload",
 
   data() {
-    // const date = new Date();
-    // `${date.getFullYear()}-${date.getMonth() +
-    //       1}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`
     return {
       form: {
-        // name: "",
         files: []
       },
 
       progress: [],
 
-      sending: false
+      sending: false,
+
+      sucess: false
     };
   },
 
@@ -54,6 +52,7 @@ export default {
 
     async createFolderWithFiles() {
       this.sending = true;
+      this.sucess = false
       try {
         const date = new Date();
         const [year, mount, day, hours, minutes, seconds] = [
@@ -79,19 +78,24 @@ export default {
         const promisesFiles = [];
 
         for (let i = 0; i < files.length; i++) {
-          promisesFiles.push(
-            this.createFile(folderResponse.result.id, files[i], event => {
-              const { loaded = 1, total = 1 } = event;
-              const progress = JSON.parse(JSON.stringify(this.progress));
-              progress[i] = { loaded, total };
-              this.progress = progress;
-            })
-          );
+          // promisesFiles.push(
+          await this.createFile(folderResponse.result.id, files[i], (event) => {
+            const progress = JSON.parse(JSON.stringify(this.progress));
+            progress[i] = {
+              percentaje: this.calculatePercent(event),
+              event
+            }
+
+            this.progress = progress;
+          })
+          // );
         }
 
-        const filesResponse = await Promise.all(promisesFiles);
+        this.progress = []
+        this.form.files = []
+        this.sucess = true
 
-        console.log(filesResponse);
+        this.$router.push(`/folders/${folderResponse.result.id}`)
       } catch (error) {
         console.log(error);
       } finally {
@@ -106,19 +110,22 @@ export default {
         parents: [parentId]
       };
 
-      var accessToken = gapi.auth.getToken().access_token; // Here gapi is used for retrieving the access token.
-      var form = new FormData();
+      const accessToken = gapi.auth.getToken().access_token; // Here gapi is used for retrieving the access token.
+      
+      const form = new FormData();
       form.append(
         "metadata",
         new Blob([JSON.stringify(metadata)], { type: "application/json" })
       );
       form.append("file", file);
+
       const config = {
         headers: {
           Authorization: "Bearer " + accessToken
         },
         onUploadProgress
       };
+
       return this.$axios.$post(
         "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
         form,
@@ -146,12 +153,7 @@ export default {
 
     calculatePercent(event) {
       try {
-        let percent = 0;
-        const position = event.loaded;
-        const total = event.total;
-        percent = Math.ceil((position / total) * 100);
-        console.log(((position / total) * 100).toFixed(2));
-        return percent;
+        return Math.round((event.loaded * 100) / event.total );
       } catch (error) {
         return 0;
       }
@@ -162,25 +164,6 @@ export default {
 
   computed: {
     ...mapState("user", ["baseFolder"]),
-
-    percentajeTotal() {
-      // console.log("Entro");
-      const { loaded, total, lengthComputable } = this.progress.reduce(
-        (ant, act) => {
-          ant.loaded += act.loaded;
-          ant.total += act.total;
-          return ant;
-        },
-        { loaded: 0, total: 0 }
-      );
-
-      return (
-        this.calculatePercent({
-          loaded,
-          total
-        }) || 0
-      );
-    }
   }
 };
 </script>

@@ -1,22 +1,24 @@
 <template>
   <section class="container">
-    <p>
-      Estado del usuario
-      <strong>{{ isSignedIn? 'Conectado' : 'Desconectado' }}</strong>
-    </p>
+    <div>
+      <p>
+        Estado del usuario
+        <strong>{{ isSignedIn? 'Conectado' : 'Desconectado' }}</strong>
+      </p>
 
-    <!--Add buttons to initiate auth sequence and sign out-->
-    <button v-if="isSignedIn" @click="handleSignoutClick">Cerrar sesion</button>
-    <button v-else @click="handleAuthClick">Iniciar sesion</button>
+      <button v-if="isSignedIn" @click="handleSignoutClick">Cerrar sesion</button>
+      <button v-else @click="handleAuthClick">Iniciar sesion</button>
+    </div>
 
-    <!-- <form @submit.prevent="createFolder">
-      <input type="text" v-model="form.name" placeholder="Ingrese nombre de la carpeta">
-      <button type="submit">Crear carpeta</button>
-    </form>
-
-    <ul v-if="isSignedIn">
-      <li v-for="file in files" :key="file.id">({{ file.id }}) {{ file.name }}</li>
-    </ul>-->
+    <div>
+      <h1>¿Qué puedo hacer?</h1>
+      <ul>
+        <li>Vincular tu cuenta de google drive con la aplicación al tocar el boton de <strong>iniciar sesión</strong></li>
+        <li>Crear carpetas con archivos que se guardaran en tu drive una vez dado los permisos necesarios</li>
+        <li>Ver todas las carpetas creadas con sus contenidos</li>
+        <li>Eliminar una carpeta</li>
+      </ul>
+    </div>
   </section>
 </template>
 

@@ -1,19 +1,30 @@
 <template>
   <div>
-    <ul>
+    <ul v-if="isSignedIn">
       <li>
         <nuxt-link to="/">Estado del usuario</nuxt-link>
       </li>
       <li>
-        <nuxt-link to="/createfolderwithfiles">Crear carpeta con archivos</nuxt-link>
+        <nuxt-link to="/folders/new">Subir archivos</nuxt-link>
       </li>
       <li>
-        <nuxt-link to="/list">Listar carpetas</nuxt-link>
+        <nuxt-link to="/folders">Listar carpetas</nuxt-link>
       </li>
     </ul>
     <nuxt/>
   </div>
 </template>
+
+<script>
+import { mapState } from 'vuex'
+
+export default {
+  computed: {
+    ...mapState('user', ['isSignedIn'])
+  }
+}
+</script>
+
 
 <style>
 </style>
